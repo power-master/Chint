@@ -1,1173 +1,1061 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>نظام تسعير المنتجات - باور ماستر</title>
+<title>عرض سعر — باور ماستر</title>
 
-<!-- مكتبة Excel -->
+<!-- Excel -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    font-family: Tahoma, Arial, sans-serif;
-    background: #f3f7fb;
-    color: #1f2937;
+body{
+    margin:0;
+    font-family:Tahoma, Arial, sans-serif;
+    background:#f3f6f9;
+    color:#1f2937;
 }
 
-button,
-input {
-    font-family: inherit;
-}
-
-.header {
-    background: linear-gradient(135deg, #0878df, #00a8ff);
-    color: white;
-    padding: 22px 15px;
-    text-align: center;
-    box-shadow: 0 3px 15px rgba(0,0,0,.15);
-}
-
-.header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-.header p {
-    margin: 7px 0 0;
-    font-size: 14px;
-}
-
-.container {
-    max-width: 1150px;
-    margin: 25px auto;
-    padding: 0 15px;
-}
-
-.card {
-    background: white;
-    border-radius: 15px;
-    padding: 22px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,.07);
-}
-
-.card-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #0878df;
-    border-right: 5px solid #0878df;
-    padding-right: 10px;
-    margin-bottom: 20px;
-}
-
-/* اختيار المنتج */
-
-.product-selector {
-    position: relative;
-}
-
-.product-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.product-input-wrapper {
-    position: relative;
-}
-
-.product-input {
-    width: 100%;
-    height: 52px;
-    padding: 0 48px 0 15px;
-    border: 2px solid #d5e2ef;
-    border-radius: 10px;
-    font-size: 16px;
-    background: white;
-    cursor: pointer;
-}
-
-.product-input:focus {
-    border-color: #0878df;
-    outline: none;
-}
-
-.dropdown-arrow {
-    position: absolute;
-    right: 16px;
-    top: 15px;
-    font-size: 20px;
-    color: #0878df;
-    pointer-events: none;
-}
-
-.product-dropdown {
-    display: none;
-    position: absolute;
-    z-index: 500;
-    width: 100%;
-    top: 82px;
-    right: 0;
-    background: white;
-    border: 1px solid #d9e4ef;
-    border-radius: 12px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.16);
-    overflow: hidden;
-}
+/* =========================
+   HEADER
+========================= */
 
-.product-dropdown.show {
-    display: block;
+.header{
+    background:linear-gradient(135deg,#0d6efd,#00a8ff);
+    color:white;
+    padding:22px 20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.15);
 }
 
-.dropdown-search {
-    padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8fbff;
+.header-inner{
+    max-width:1250px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
 }
 
-.dropdown-search input {
-    width: 100%;
-    padding: 11px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 14px;
+.company-name{
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:6px;
 }
 
-.products-list {
-    max-height: 330px;
-    overflow-y: auto;
+.company-subtitle{
+    font-size:16px;
+    opacity:.95;
 }
 
-.product-option {
-    padding: 13px 15px;
-    border-bottom: 1px solid #edf1f5;
-    cursor: pointer;
+.manager-info{
+    text-align:left;
+    font-size:14px;
+    line-height:1.8;
 }
 
-.product-option:hover {
-    background: #eef7ff;
+.manager-info strong{
+    font-size:15px;
 }
 
-.option-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
+/* =========================
+   MAIN
+========================= */
 
-.option-details {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    color: #667085;
-    font-size: 12px;
+.container{
+    max-width:1250px;
+    margin:25px auto;
+    padding:0 15px;
 }
 
-.option-price {
-    color: #07833a;
-    font-weight: bold;
-    font-size: 14px;
+.card{
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.07);
 }
 
-.no-results {
-    text-align: center;
-    padding: 25px;
-    color: #777;
+.card-title{
+    font-size:19px;
+    font-weight:bold;
+    color:#075cb8;
+    margin-bottom:18px;
+    border-right:4px solid #0d6efd;
+    padding-right:10px;
 }
 
-/* المنتج المختار */
-
-.selected-product {
-    display: none;
-    margin-top: 18px;
-    padding: 18px;
-    border-radius: 12px;
-    background: #f4f9ff;
-    border: 1px solid #d8eaff;
-}
+/* =========================
+   FORM
+========================= */
 
-.selected-product.show {
-    display: block;
+.form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr auto;
+    gap:12px;
+    align-items:end;
 }
 
-.selected-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 12px;
-    align-items: center;
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
 }
 
-.selected-name {
-    font-weight: bold;
+.field label{
+    font-weight:bold;
+    font-size:14px;
 }
 
-.selected-brand {
-    color: #667085;
+input,
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccd6e0;
+    border-radius:8px;
+    font-size:15px;
+    background:white;
 }
 
-.selected-price {
-    color: #07833a;
-    font-size: 21px;
-    font-weight: bold;
-    text-align: left;
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#0d6efd;
+    box-shadow:0 0 0 3px rgba(13,110,253,.1);
 }
 
-/* الأزرار */
+/* =========================
+   BUTTONS
+========================= */
 
-.btn {
-    border: none;
-    border-radius: 8px;
-    padding: 11px 18px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: .2s;
+button{
+    border:none;
+    border-radius:8px;
+    padding:11px 16px;
+    font-family:inherit;
+    font-size:14px;
+    cursor:pointer;
+    transition:.2s;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
+button:hover{
+    transform:translateY(-1px);
 }
 
-.btn-primary {
-    background: #0878df;
-    color: white;
+.btn-primary{
+    background:#0d6efd;
+    color:white;
 }
 
-.btn-success {
-    background: #159447;
-    color: white;
+.btn-success{
+    background:#198754;
+    color:white;
 }
 
-.btn-danger {
-    background: #dc3545;
-    color: white;
+.btn-danger{
+    background:#dc3545;
+    color:white;
 }
 
-.btn-dark {
-    background: #263238;
-    color: white;
+.btn-warning{
+    background:#f0ad00;
+    color:white;
 }
 
-.btn-light {
-    background: #eaf3fb;
-    color: #0878df;
+.btn-secondary{
+    background:#6c757d;
+    color:white;
 }
 
-.btn-warning {
-    background: #f59e0b;
-    color: white;
+.btn-dark{
+    background:#212529;
+    color:white;
 }
 
-.add-button {
-    margin-top: 15px;
-    width: 100%;
-    height: 48px;
-    font-size: 16px;
-    font-weight: bold;
+.btn-light{
+    background:#eef3f8;
+    color:#263238;
 }
 
-/* جدول العرض */
-
-.quote-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.quote-table th {
-    background: #263238;
-    color: white;
-    padding: 12px;
+.btn-small{
+    padding:7px 10px;
+    font-size:12px;
 }
 
-.quote-table td {
-    padding: 11px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: center;
-}
+/* =========================
+   SEARCH
+========================= */
 
-.quote-table tr:hover {
-    background: #f8fbff;
+.search-box{
+    margin-bottom:15px;
 }
 
-.qty-input {
-    width: 70px;
-    padding: 7px;
-    text-align: center;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+.search-box input{
+    font-size:16px;
 }
 
-.sale-price {
-    color: #0878df;
-    font-weight: bold;
-}
+/* =========================
+   PRODUCTS TABLE
+========================= */
 
-.item-total {
-    font-weight: bold;
+.table-wrapper{
+    overflow-x:auto;
 }
-
-/* الإجمالي */
-
-.total-area {
-    margin-top: 20px;
-    background: #eef8ff;
-    border: 1px solid #d5ebff;
-    padding: 18px;
-    border-radius: 10px;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:700px;
 }
 
-.total-number {
-    color: #0878df;
-    font-size: 24px;
-    font-weight: bold;
+th{
+    background:#0d6efd;
+    color:white;
+    padding:12px 8px;
+    text-align:center;
+    font-size:14px;
 }
 
-.empty {
-    text-align: center;
-    color: #777;
-    padding: 30px;
+td{
+    border-bottom:1px solid #e5e7eb;
+    padding:11px 8px;
+    text-align:center;
+    font-size:14px;
 }
-
-/* المدير */
-
-.admin-button {
-    position: fixed;
-    bottom: 22px;
-    left: 22px;
-
-    width: 55px;
-    height: 55px;
-
-    border-radius: 50%;
-    border: none;
 
-    background: #263238;
-    color: white;
-
-    font-size: 22px;
-
-    cursor: pointer;
-
-    box-shadow: 0 5px 20px rgba(0,0,0,.25);
-
-    z-index: 900;
+tr:hover td{
+    background:#f8fbff;
 }
 
-.admin-panel {
-    display: none;
+.price{
+    font-weight:bold;
+    color:#075cb8;
 }
 
-.settings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+.sale-price{
+    color:#198754;
+    font-weight:bold;
+    font-size:15px;
 }
 
-.setting-box {
-    background: #f7fbff;
-    border: 1px solid #d9e9f8;
-    padding: 18px;
-    border-radius: 10px;
-}
+/* =========================
+   QUOTE
+========================= */
 
-.setting-box label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 8px;
+.quote-summary{
+    display:flex;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:18px;
 }
 
-.setting-box input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 18px;
-    text-align: center;
+.summary-box{
+    background:#f2f7fc;
+    border:1px solid #d9e7f5;
+    padding:12px 20px;
+    border-radius:10px;
+    min-width:150px;
+    text-align:center;
 }
 
-.admin-note {
-    margin-top: 15px;
-    background: #fff8e8;
-    border: 1px solid #f2d28b;
-    padding: 12px;
-    border-radius: 8px;
-    color: #765a13;
-    font-size: 13px;
-    line-height: 1.8;
+.summary-label{
+    font-size:13px;
+    color:#667085;
+    margin-bottom:5px;
 }
 
-/* إدارة المنتجات */
-
-.products-admin {
-    margin-top: 30px;
-    padding-top: 25px;
-    border-top: 2px solid #e5edf5;
+.summary-value{
+    font-size:19px;
+    font-weight:bold;
+    color:#075cb8;
 }
 
-.product-form {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 12px;
+.quote-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
 }
 
-.product-form input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 15px;
-}
+/* =========================
+   MANAGER
+========================= */
 
-.product-form button {
-    grid-column: 1 / -1;
+.manager-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
 }
 
-.admin-products-search {
-    margin-top: 18px;
+.settings-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:12px;
+    align-items:end;
+    margin-bottom:20px;
 }
 
-.admin-products-search input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+.manager-status{
+    background:#e9f7ef;
+    color:#146c43;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:bold;
+    margin-bottom:15px;
 }
 
-.products-admin-table {
-    margin-top: 15px;
-    overflow-x: auto;
+.hidden{
+    display:none !important;
 }
 
-.products-admin-table table {
-    width: 100%;
-    border-collapse: collapse;
-}
+/* =========================
+   LOGIN MODAL
+========================= */
 
-.products-admin-table th {
-    background: #263238;
-    color: white;
-    padding: 10px;
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
 }
 
-.products-admin-table td {
-    padding: 9px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: center;
+.modal-box{
+    background:white;
+    width:100%;
+    max-width:420px;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
 }
 
-.products-admin-table tr:hover {
-    background: #f8fbff;
+.modal-title{
+    font-size:21px;
+    font-weight:bold;
+    color:#075cb8;
+    margin-bottom:20px;
 }
 
-.admin-small-btn {
-    padding: 7px 10px;
-    font-size: 12px;
+.modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
 }
 
-/* Excel */
+/* =========================
+   NOTIFICATION
+========================= */
 
-.import-area {
-    margin-top: 20px;
-    padding: 18px;
-    background: #f7fbff;
-    border: 1px dashed #8bbde9;
-    border-radius: 10px;
+.toast{
+    position:fixed;
+    left:20px;
+    bottom:20px;
+    background:#212529;
+    color:white;
+    padding:13px 18px;
+    border-radius:9px;
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
+    z-index:2000;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(15px);
+    transition:.25s;
 }
 
-.import-area h3 {
-    margin-top: 0;
-    color: #0878df;
+.toast.show{
+    opacity:1;
+    transform:translateY(0);
 }
 
-.import-note {
-    font-size: 13px;
-    color: #667085;
-    line-height: 1.8;
+.toast.success{
+    background:#198754;
 }
 
-.file-input {
-    margin-top: 10px;
-    width: 100%;
+.toast.error{
+    background:#dc3545;
 }
 
-/* Modal */
+/* =========================
+   FOOTER
+========================= */
 
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.55);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
+.footer{
+    text-align:center;
+    color:#6b7280;
+    font-size:13px;
+    padding:20px;
 }
 
-.modal.show {
-    display: flex;
-}
+/* =========================
+   MOBILE
+========================= */
 
-.modal-box {
-    background: white;
-    width: 100%;
-    max-width: 420px;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 15px 50px rgba(0,0,0,.3);
-}
+@media(max-width:800px){
 
-.modal-title {
-    font-size: 21px;
-    font-weight: bold;
-    color: #0878df;
-    margin-bottom: 20px;
-}
+    .header-inner{
+        flex-direction:column;
+        align-items:flex-start;
+    }
 
-.password-input {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 17px;
-}
+    .manager-info{
+        text-align:right;
+    }
 
-.error {
-    color: #b42318;
-    background: #fff0f0;
-    padding: 10px;
-    border-radius: 7px;
-    margin-top: 10px;
-    display: none;
-}
+    .form-grid{
+        grid-template-columns:1fr;
+    }
 
-/* الرسائل */
+    .settings-grid{
+        grid-template-columns:1fr;
+    }
 
-.message {
-    padding: 11px;
-    border-radius: 8px;
-    margin-top: 12px;
-    display: none;
-}
+    .company-name{
+        font-size:21px;
+    }
 
-.success-message {
-    background: #e8f7ee;
-    color: #137333;
 }
 
-.error-message {
-    background: #fff0f0;
-    color: #b42318;
-}
+/* =========================
+   PRINT
+========================= */
 
-/* الطباعة */
+@media print{
 
-@media print {
+    body{
+        background:white;
+    }
 
-    body {
-        background: white;
+    .header{
+        box-shadow:none;
+        background:#0d6efd !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
     }
 
     .no-print,
-    .admin-button,
-    .search-section,
-    .admin-panel,
-    .delete-column {
-        display: none !important;
+    .manager-section,
+    .product-selector,
+    .quote-actions,
+    .footer{
+        display:none !important;
     }
 
-    .card {
-        box-shadow: none;
-        border: none;
+    .container{
+        max-width:none;
+        margin:0;
+        padding:10px;
     }
 
-    .header {
-        background: white !important;
-        color: black !important;
-        box-shadow: none;
-        border-bottom: 2px solid #222;
+    .card{
+        box-shadow:none;
+        border:1px solid #ddd;
     }
 
-    .quote-table th {
-        background: #eee !important;
-        color: black !important;
+    .delete-col,
+    .manager-col{
+        display:none !important;
     }
+
+    table{
+        min-width:0;
+    }
+
+    th{
+        background:#0d6efd !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+    }
+
+    .print-title{
+        display:block !important;
+    }
+
 }
 
-/* الموبايل */
-
-@media(max-width:700px) {
-
-    .selected-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .selected-price {
-        text-align: right;
-    }
-
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .product-form {
-        grid-template-columns: 1fr;
-    }
-
-    .product-form button {
-        grid-column: auto;
-    }
-
-    .quote-table {
-        font-size: 12px;
-    }
-
-    .quote-table th,
-    .quote-table td {
-        padding: 7px 4px;
-    }
-
+.print-title{
+    display:none;
 }
 
 </style>
-
 </head>
 
 <body>
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header class="header">
 
-    <h1>شركة باور ماستر</h1>
+    <div class="header-inner">
 
-    <p>للتوريدات الكهربائية والحلول الصناعية</p>
+        <div>
+            <div class="company-name">
+                شركة باور ماستر
+            </div>
 
-    <p>نظام تسعير المنتجات</p>
+            <div class="company-subtitle">
+                للتوريدات الكهربائية والحلول الصناعية
+            </div>
+        </div>
+
+        <div class="manager-info">
+            <div>
+                مدير المبيعات :
+                <strong>محمد رمضان</strong>
+            </div>
+
+            <div>
+                01036500195
+            </div>
+        </div>
+
+    </div>
 
 </header>
 
 
 <div class="container">
 
+    <!-- =========================
+         PRODUCT SELECTOR
+    ========================= -->
 
-<!-- =====================================================
-     اختيار المنتج
-===================================================== -->
+    <section class="card product-selector">
 
-<div class="card search-section">
+        <div class="card-title">
+            اختيار المنتج
+        </div>
 
-    <div class="card-title">
-        اختيار المنتج
-    </div>
+        <div class="form-grid">
 
-    <div class="product-selector">
+            <div class="field">
 
-        <label class="product-label">
-            اضغط لاختيار المنتج
-        </label>
+                <label>
+                    المنتج
+                </label>
 
-        <div class="product-input-wrapper">
+                <select id="productSelect">
+                    <option value="">
+                        اختر المنتج
+                    </option>
+                </select>
 
-            <input
-                id="productInput"
-                class="product-input"
-                type="text"
-                placeholder="اختر المنتج أو اكتب للبحث..."
-                autocomplete="off"
-                onclick="openProductDropdown()"
-                oninput="filterProducts()"
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    الكمية
+                </label>
+
+                <input
+                    type="number"
+                    id="quantityInput"
+                    min="1"
+                    value="1"
+                >
+
+            </div>
+
+
+            <button
+                class="btn-primary"
+                onclick="addSelectedProduct()"
             >
+                + إضافة للعرض
+            </button>
 
-            <span class="dropdown-arrow">
-                ▼
-            </span>
+        </div>
 
-            <div
-                id="productDropdown"
-                class="product-dropdown"
-            >
+    </section>
 
-                <div class="dropdown-search">
 
-                    <input
-                        id="dropdownSearch"
-                        type="text"
-                        placeholder="ابحث باسم المنتج أو الماركة أو الأمبير..."
-                        oninput="filterProducts()"
-                    >
+    <!-- =========================
+         QUOTE
+    ========================= -->
 
+    <section class="card">
+
+        <div class="card-title">
+            عرض السعر
+        </div>
+
+        <div class="print-title">
+
+            <h2 style="text-align:center;">
+                عرض سعر
+            </h2>
+
+            <div style="text-align:center;margin-bottom:15px;">
+                شركة باور ماستر للتوريدات الكهربائية والحلول الصناعية
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            المنتج
+                        </th>
+
+                        <th>
+                            الماركة
+                        </th>
+
+                        <th>
+                            سعر البيع
+                        </th>
+
+                        <th>
+                            الكمية
+                        </th>
+
+                        <th>
+                            الإجمالي
+                        </th>
+
+                        <th class="delete-col no-print">
+                            حذف
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="quoteBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="quote-summary">
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    عدد الأصناف
                 </div>
 
                 <div
-                    id="productsList"
-                    class="products-list"
-                ></div>
+                    class="summary-value"
+                    id="totalItems"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    إجمالي الكمية
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="totalQuantity"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-label">
+                    الإجمالي
+                </div>
+
+                <div
+                    class="summary-value"
+                    id="grandTotal"
+                >
+                    0.00
+                </div>
 
             </div>
 
         </div>
 
 
-        <div
-            id="selectedProduct"
-            class="selected-product"
-        >
-
-            <div class="selected-grid">
-
-                <div>
-
-                    <div class="option-details">
-                        اسم المنتج
-                    </div>
-
-                    <div
-                        id="selectedName"
-                        class="selected-name"
-                    ></div>
-
-                </div>
-
-
-                <div>
-
-                    <div class="option-details">
-                        الماركة
-                    </div>
-
-                    <div
-                        id="selectedBrand"
-                        class="selected-brand"
-                    ></div>
-
-                </div>
-
-
-                <div>
-
-                    <div class="option-details">
-                        سعر البيع
-                    </div>
-
-                    <div
-                        id="selectedPrice"
-                        class="selected-price"
-                    ></div>
-
-                </div>
-
-            </div>
-
+        <div class="quote-actions no-print">
 
             <button
-                class="btn btn-success add-button"
-                onclick="addSelectedProduct()"
+                class="btn-success"
+                onclick="printQuote()"
             >
-                + إضافة المنتج إلى عرض السعر
+                🖨 طباعة عرض السعر
+            </button>
+
+            <button
+                class="btn-danger"
+                onclick="clearQuote()"
+            >
+                مسح العرض
             </button>
 
         </div>
 
-    </div>
-
-</div>
+    </section>
 
 
-<!-- =====================================================
-     عرض السعر
-===================================================== -->
+    <!-- =========================
+         MANAGER BUTTON
+    ========================= -->
 
-<div class="card">
+    <section class="card no-print">
 
-    <div class="card-title">
-        عرض الأسعار
-    </div>
+        <button
+            class="btn-dark"
+            onclick="openLogin()"
+        >
+            🔐 دخول المدير
+        </button>
 
-    <div id="quoteArea">
-
-        <div class="empty">
-            لم تتم إضافة أي منتجات
-        </div>
-
-    </div>
+    </section>
 
 
-    <div
-        id="totalArea"
-        class="total-area"
-        style="display:none;"
+    <!-- =========================
+         MANAGER PANEL
+    ========================= -->
+
+    <section
+        class="card manager-section hidden"
+        id="managerPanel"
     >
-
-        <div>
-            عدد البنود:
-            <strong id="totalItems">0</strong>
-        </div>
-
-        <div>
-            إجمالي الكميات:
-            <strong id="totalQty">0</strong>
-        </div>
-
-        <div>
-            الإجمالي:
-            <span
-                id="grandTotal"
-                class="total-number"
-            >
-                0.00 جنيه
-            </span>
-        </div>
-
-    </div>
-
-
-    <div
-        class="no-print"
-        style="
-            margin-top:20px;
-            display:flex;
-            gap:10px;
-            flex-wrap:wrap;
-        "
-    >
-
-        <button
-            class="btn btn-success"
-            onclick="printQuote()"
-        >
-            🖨 طباعة عرض السعر
-        </button>
-
-
-        <button
-            class="btn btn-danger"
-            onclick="clearQuote()"
-        >
-            مسح العرض
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
-     لوحة المدير
-===================================================== -->
-
-<div
-    id="adminPanel"
-    class="card admin-panel"
->
-
-    <div class="card-title">
-        إعدادات وإدارة النظام - المدير
-    </div>
-
-
-    <div class="settings-grid">
-
-        <div class="setting-box">
-
-            <label>
-                خصم الوكيل من اللستة %
-            </label>
-
-            <input
-                id="dealerDiscount"
-                type="number"
-                min="0"
-                max="100"
-                step="0.1"
-            >
-
-        </div>
-
-
-        <div class="setting-box">
-
-            <label>
-                نسبة أرباحنا %
-            </label>
-
-            <input
-                id="profitPercent"
-                type="number"
-                min="0"
-                max="1000"
-                step="0.1"
-            >
-
-        </div>
-
-    </div>
-
-
-    <div class="admin-note">
-
-        <strong>طريقة الحساب:</strong>
-
-        <br>
-
-        سعر الشراء =
-        سعر اللستة × (1 − خصم الوكيل ÷ 100)
-
-        <br>
-
-        سعر البيع =
-        سعر الشراء × (1 + نسبة الربح ÷ 100)
-
-        <br><br>
-
-        أسعار اللستة والشراء خاصة بالمدير ولا تظهر للموظف.
-
-    </div>
-
-
-    <div
-        style="
-            margin-top:18px;
-            display:flex;
-            gap:10px;
-            flex-wrap:wrap;
-        "
-    >
-
-        <button
-            class="btn btn-primary"
-            onclick="saveSettings()"
-        >
-            حفظ وتحديث الأسعار
-        </button>
-
-
-        <button
-            class="btn btn-dark"
-            onclick="changePassword()"
-        >
-            تغيير كلمة المرور
-        </button>
-
-
-        <button
-            class="btn btn-danger"
-            onclick="logoutAdmin()"
-        >
-            خروج
-        </button>
-
-    </div>
-
-
-    <!-- إدارة المنتجات -->
-
-    <div class="products-admin">
 
         <div class="card-title">
-            إدارة المنتجات
+            لوحة تحكم المدير
         </div>
 
 
-        <div class="admin-note">
-
-            <strong>صيغة المنتجات:</strong>
-
-            <br>
-
-            اسم المنتج | الماركة | سعر اللستة
-
-            <br><br>
-
-            لا تدخل سعر الشراء أو سعر البيع.
-            النظام يحسبهما تلقائيًا.
-
+        <div class="manager-status">
+            تم تسجيل الدخول كمدير
         </div>
 
 
-        <div class="product-form">
+        <!-- SETTINGS -->
 
-            <input
-                id="adminProductName"
-                type="text"
-                placeholder="اسم المنتج"
-            >
+        <h3 style="margin-top:0;">
+            إعدادات التسعير
+        </h3>
 
+        <div class="settings-grid">
 
-            <input
-                id="adminProductBrand"
-                type="text"
-                placeholder="الماركة"
-            >
+            <div class="field">
 
+                <label>
+                    خصم الموزع %
+                </label>
 
-            <input
-                id="adminProductPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="سعر اللستة"
-            >
-
-
-            <button
-                id="saveProductButton"
-                class="btn btn-success"
-                onclick="saveProduct()"
-            >
-                + إضافة المنتج
-            </button>
-
-        </div>
-
-
-        <div
-            id="cancelEditArea"
-            style="
-                margin-top:10px;
-                display:none;
-            "
-        >
-
-            <button
-                class="btn btn-light"
-                onclick="cancelProductEdit()"
-            >
-                إلغاء التعديل
-            </button>
-
-        </div>
-
-
-        <div class="admin-products-search">
-
-            <input
-                id="adminProductSearch"
-                type="text"
-                placeholder="ابحث في المنتجات..."
-                oninput="renderAdminProducts()"
-            >
-
-        </div>
-
-
-        <div
-            id="adminProductsTable"
-            class="products-admin-table"
-        ></div>
-
-
-        <!-- Excel -->
-
-        <div class="import-area">
-
-            <h3>
-                استيراد المنتجات من Excel
-            </h3>
-
-            <div class="import-note">
-
-                يجب أن يكون الصف الأول:
-
-                <br><br>
-
-                <strong>
-                    اسم المنتج | الماركة | سعر اللستة
-                </strong>
-
-                <br><br>
-
-                مثال:
-
-                <br>
-
-                مفتاح أوتوماتيك 6 أمبير | شنت | 157.84
-
-                <br><br>
-
-                عند الاستيراد سيتم استبدال المنتجات الحالية بمنتجات ملف Excel.
+                <input
+                    type="number"
+                    id="dealerDiscount"
+                    step="0.01"
+                    min="0"
+                >
 
             </div>
 
 
-            <input
-                id="excelFile"
-                class="file-input"
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                onchange="importProducts(event)"
+            <div class="field">
+
+                <label>
+                    ربح الشركة %
+                </label>
+
+                <input
+                    type="number"
+                    id="profitPercent"
+                    step="0.01"
+                    min="0"
+                >
+
+            </div>
+
+
+            <button
+                class="btn-success"
+                onclick="saveSettings()"
             >
+                حفظ الإعدادات
+            </button>
 
         </div>
 
 
-        <div
-            style="
-                margin-top:15px;
-                display:flex;
-                gap:10px;
-                flex-wrap:wrap;
-            "
-        >
+        <hr style="border:none;border-top:1px solid #eee;margin:25px 0;">
+
+
+        <!-- PRODUCT MANAGEMENT -->
+
+        <h3>
+            إدارة المنتجات
+        </h3>
+
+
+        <div class="manager-toolbar">
 
             <button
-                class="btn btn-primary"
-                onclick="exportProducts()"
+                class="btn-primary"
+                onclick="openAddProduct()"
             >
-                تحميل نسخة المنتجات
+                + إضافة منتج
             </button>
 
 
             <button
-                class="btn btn-danger"
+                class="btn-success"
+                onclick="document.getElementById('excelFile').click()"
+            >
+                📥 استيراد Excel
+            </button>
+
+            <input
+                type="file"
+                id="excelFile"
+                accept=".xlsx,.xls"
+                style="display:none"
+                onchange="importExcel(event)"
+            >
+
+
+            <button
+                class="btn-warning"
+                onclick="exportExcel()"
+            >
+                📤 تصدير Excel
+            </button>
+
+
+            <button
+                class="btn-danger"
                 onclick="deleteAllProducts()"
             >
                 حذف جميع المنتجات
             </button>
 
+
+            <button
+                class="btn-secondary"
+                onclick="logoutManager()"
+            >
+                تسجيل الخروج
+            </button>
+
         </div>
 
-    </div>
+
+        <!-- PRODUCT FORM -->
+
+        <div
+            id="productForm"
+            class="hidden"
+            style="
+                background:#f7f9fb;
+                padding:18px;
+                border-radius:10px;
+                margin-bottom:20px;
+            "
+        >
+
+            <h4 id="productFormTitle">
+                إضافة منتج
+            </h4>
 
 
-    <div
-        id="adminMessage"
-        class="message"
-    ></div>
+            <input
+                type="hidden"
+                id="editProductId"
+            >
+
+
+            <div
+                style="
+                    display:grid;
+                    grid-template-columns:2fr 1fr 1fr auto;
+                    gap:10px;
+                    align-items:end;
+                "
+            >
+
+                <div class="field">
+
+                    <label>
+                        اسم المنتج
+                    </label>
+
+                    <input
+                        id="productName"
+                        type="text"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        الماركة
+                    </label>
+
+                    <input
+                        id="productBrand"
+                        type="text"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        سعر اللستة
+                    </label>
+
+                    <input
+                        id="productListPrice"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <button
+                    class="btn-success"
+                    onclick="saveProduct()"
+                >
+                    حفظ
+                </button>
+
+            </div>
+
+
+            <div style="margin-top:10px;">
+
+                <button
+                    class="btn-secondary btn-small"
+                    onclick="closeProductForm()"
+                >
+                    إلغاء
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="managerSearch"
+                placeholder="ابحث عن اسم المنتج أو الماركة..."
+                oninput="renderManagerProducts()"
+            >
+
+        </div>
+
+
+        <!-- MANAGER TABLE -->
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            اسم المنتج
+                        </th>
+
+                        <th>
+                            الماركة
+                        </th>
+
+                        <th>
+                            سعر اللستة
+                        </th>
+
+                        <th>
+                            سعر الشراء
+                        </th>
+
+                        <th>
+                            سعر البيع
+                        </th>
+
+                        <th>
+                            إجراءات
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="managerProductsBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
 
 </div>
 
 
-</div>
+<footer class="footer">
+    شركة باور ماستر للتوريدات الكهربائية والحلول الصناعية
+</footer>
 
 
-<!-- زر المدير -->
-
-<button
-    class="admin-button no-print"
-    onclick="openLogin()"
-    title="دخول المدير"
->
-    🔐
-</button>
-
-
-<!-- نافذة الدخول -->
+<!-- =========================
+     LOGIN MODAL
+========================= -->
 
 <div
+    class="modal hidden"
     id="loginModal"
-    class="modal"
 >
 
     <div class="modal-box">
@@ -1176,47 +1064,34 @@ input {
             دخول المدير
         </div>
 
-        <label>
-            كلمة المرور
-        </label>
 
-        <input
-            id="passwordInput"
-            class="password-input"
-            type="password"
-            placeholder="أدخل كلمة مرور المدير"
-            onkeydown="
-                if(event.key === 'Enter') {
-                    loginAdmin();
-                }
-            "
-        >
+        <div class="field">
 
-        <div
-            id="loginError"
-            class="error"
-        >
-            كلمة المرور غير صحيحة
+            <label>
+                كلمة المرور
+            </label>
+
+            <input
+                type="password"
+                id="managerPassword"
+                placeholder="أدخل كلمة المرور"
+                onkeydown="if(event.key==='Enter') loginManager()"
+            >
+
         </div>
 
-        <div
-            style="
-                margin-top:18px;
-                display:flex;
-                gap:10px;
-            "
-        >
+
+        <div class="modal-actions">
 
             <button
-                class="btn btn-primary"
-                onclick="loginAdmin()"
+                class="btn-primary"
+                onclick="loginManager()"
             >
                 دخول
             </button>
 
-
             <button
-                class="btn btn-light"
+                class="btn-secondary"
                 onclick="closeLogin()"
             >
                 إلغاء
@@ -1229,59 +1104,103 @@ input {
 </div>
 
 
+<!-- TOAST -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
 <script>
 
 /* =========================================================
-   البيانات الافتراضية
+   POWER MASTER
+   PRODUCT PRICING SYSTEM
 ========================================================= */
 
-const defaultProducts = [
+
+/* =========================
+   CONSTANTS
+========================= */
+
+const PRODUCTS_KEY = "powerMasterProducts";
+
+const SETTINGS_KEY = "powerMasterPricingSettings";
+
+const MANAGER_LOGIN_KEY = "powerMasterManagerLoggedIn";
+
+/*
+    كلمة مرور المدير
+    يمكنك تغييرها هنا إذا أردت
+*/
+const MANAGER_PASSWORD = "1234";
+
+
+/* =========================
+   DEFAULT SETTINGS
+========================= */
+
+const DEFAULT_SETTINGS = {
+
+    dealerDiscount: 38,
+
+    profitPercent: 55
+
+};
+
+
+/* =========================
+   DEFAULT PRODUCTS
+========================= */
+
+const DEFAULT_PRODUCTS = [
 
     {
-        id: 1,
-        name: "مفتاح أوتوماتيك, أحادى, 6 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 6 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 157.84
     },
 
     {
-        id: 2,
-        name: "مفتاح أوتوماتيك, أحادى, 10 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 10 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     },
 
     {
-        id: 3,
-        name: "مفتاح أوتوماتيك, أحادى, 16 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 16 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     },
 
     {
-        id: 4,
-        name: "مفتاح أوتوماتيك, أحادى, 20 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 20 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     },
 
     {
-        id: 5,
-        name: "مفتاح أوتوماتيك, أحادى, 25 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 25 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     },
 
     {
-        id: 6,
-        name: "مفتاح أوتوماتيك, أحادى, 32 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 32 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     },
 
     {
-        id: 7,
-        name: "مفتاح أوتوماتيك, أحادى, 40 أمبير, 4.5 ك أ",
+        id: generateId(),
+        name: "مفتاح أوتوماتيك، أحادى، 40 أمبير، 4.5 ك أ",
         brand: "شنت",
         listPrice: 146.33
     }
@@ -1289,468 +1208,298 @@ const defaultProducts = [
 ];
 
 
-/* =========================================================
-   تحميل المنتجات
-========================================================= */
+/* =========================
+   STATE
+========================= */
 
-let products = loadProducts();
+let products = [];
 
-
-function loadProducts() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                "powerMasterProducts"
-            );
-
-        if (saved) {
-
-            const data =
-                JSON.parse(saved);
-
-            if (
-                Array.isArray(data)
-            ) {
-
-                return data;
-
-            }
-
-        }
-
-    } catch(error) {
-
-        console.error(error);
-
-    }
-
-    return defaultProducts.slice();
-
-}
-
-
-/* =========================================================
-   الإعدادات
-========================================================= */
-
-let settings = loadSettings();
-
-
-function loadSettings() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                "powerMasterPricingSettings"
-            );
-
-        if (saved) {
-
-            const data =
-                JSON.parse(saved);
-
-            return {
-
-                dealerDiscount:
-                    Number(
-                        data.dealerDiscount
-                    ) || 38,
-
-                profitPercent:
-                    Number(
-                        data.profitPercent
-                    ) || 55,
-
-                password:
-                    data.password ||
-                    "1234"
-
-            };
-
-        }
-
-    } catch(error) {
-
-        console.error(error);
-
-    }
-
-
-    return {
-
-        dealerDiscount: 38,
-
-        profitPercent: 55,
-
-        password: "1234"
-
-    };
-
-}
-
-
-/* =========================================================
-   المتغيرات
-========================================================= */
-
-let selectedProductId = null;
-
-let editingProductId = null;
+let settings = {};
 
 let quoteItems = [];
 
+let isManagerLoggedIn = false;
 
-/* =========================================================
-   حفظ المنتجات
-========================================================= */
 
-function saveProducts() {
+/* =========================
+   INITIALIZE
+========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        loadData();
+
+        checkManagerSession();
+
+        renderProductSelect();
+
+        renderQuote();
+
+    }
+);
+
+
+/* =========================
+   ID GENERATOR
+========================= */
+
+function generateId(){
+
+    return Date.now().toString(36) +
+           Math.random().toString(36).substring(2,9);
+
+}
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+function loadData(){
+
+    try{
+
+        const savedProducts =
+            localStorage.getItem(PRODUCTS_KEY);
+
+        const savedSettings =
+            localStorage.getItem(SETTINGS_KEY);
+
+
+        if(savedProducts){
+
+            products =
+                JSON.parse(savedProducts);
+
+        }else{
+
+            products =
+                DEFAULT_PRODUCTS;
+
+            saveProducts();
+
+        }
+
+
+        if(savedSettings){
+
+            settings =
+                JSON.parse(savedSettings);
+
+        }else{
+
+            settings =
+                {...DEFAULT_SETTINGS};
+
+            saveSettingsToStorage();
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        products =
+            [...DEFAULT_PRODUCTS];
+
+        settings =
+            {...DEFAULT_SETTINGS};
+
+        saveProducts();
+
+        saveSettingsToStorage();
+
+    }
+
+}
+
+
+/* =========================
+   SAVE PRODUCTS
+========================= */
+
+function saveProducts(){
 
     localStorage.setItem(
-        "powerMasterProducts",
+
+        PRODUCTS_KEY,
+
         JSON.stringify(products)
+
     );
 
 }
 
 
-/* =========================================================
-   حساب سعر الشراء
-========================================================= */
+/* =========================
+   SAVE SETTINGS STORAGE
+========================= */
 
-function calculatePurchasePrice(product) {
+function saveSettingsToStorage(){
 
-    const discount =
-        Number(
-            settings.dealerDiscount
-        );
+    localStorage.setItem(
 
-    return Number(
-        product.listPrice
-    ) * (
-        1 -
-        discount / 100
+        SETTINGS_KEY,
+
+        JSON.stringify(settings)
+
     );
 
 }
 
 
-/* =========================================================
-   حساب سعر البيع
-========================================================= */
+/* =========================
+   CALCULATE PURCHASE PRICE
+========================= */
 
-function calculateSalePrice(product) {
+function calculatePurchasePrice(listPrice){
+
+    return Number(listPrice) *
+        (1 - Number(settings.dealerDiscount) / 100);
+
+}
+
+
+/* =========================
+   CALCULATE SALE PRICE
+========================= */
+
+function calculateSalePrice(listPrice){
 
     const purchasePrice =
-        calculatePurchasePrice(
-            product
-        );
+        calculatePurchasePrice(listPrice);
 
-    const profit =
-        Number(
-            settings.profitPercent
-        );
-
-    return purchasePrice * (
-        1 +
-        profit / 100
-    );
+    return purchasePrice *
+        (1 + Number(settings.profitPercent) / 100);
 
 }
 
 
-/* =========================================================
-   تنسيق السعر
-========================================================= */
+/* =========================
+   FORMAT MONEY
+========================= */
 
-function formatMoney(value) {
+function formatMoney(value){
 
     return Number(value || 0)
-        .toLocaleString(
-            "en-US",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
+        .toFixed(2);
+
+}
+
+
+/* =========================
+   RENDER PRODUCT SELECT
+========================= */
+
+function renderProductSelect(){
+
+    const select =
+        document.getElementById("productSelect");
+
+    if(!select){
+        return;
+    }
+
+
+    const oldValue =
+        select.value;
+
+
+    select.innerHTML =
+        `<option value="">
+            اختر المنتج
+        </option>`;
+
+
+    const sortedProducts =
+        [...products].sort(
+
+            (a,b) =>
+                a.name.localeCompare(
+                    b.name,
+                    "ar"
+                )
+
         );
 
-}
+
+    sortedProducts.forEach(
+
+        product => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                product.id;
+
+            option.textContent =
+                `${product.name} — ${product.brand} — ${formatMoney(calculateSalePrice(product.listPrice))}`;
+
+            select.appendChild(option);
+
+        }
+
+    );
 
 
-/* =========================================================
-   حماية النص
-========================================================= */
-
-function escapeHTML(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-/* =========================================================
-   فتح قائمة المنتجات
-========================================================= */
-
-function openProductDropdown() {
-
-    document
-        .getElementById(
-            "productDropdown"
+    if(
+        oldValue &&
+        products.some(
+            p => p.id === oldValue
         )
-        .classList.add("show");
+    ){
+
+        select.value =
+            oldValue;
+
+    }
+
+}
 
 
-    const search =
+/* =========================
+   ADD SELECTED PRODUCT
+========================= */
+
+function addSelectedProduct(){
+
+    const productId =
         document.getElementById(
-            "productInput"
+            "productSelect"
         ).value;
 
 
-    renderProductsList(search);
-
-
-    setTimeout(
-        function() {
-
-            document
-                .getElementById(
-                    "dropdownSearch"
-                )
-                .focus();
-
-        },
-        50
-    );
-
-}
-
-
-/* =========================================================
-   فلترة المنتجات
-========================================================= */
-
-function filterProducts() {
-
-    const input =
-        document.getElementById(
-            "productInput"
-        ).value
-        .trim()
-        .toLowerCase();
-
-
-    const dropdown =
-        document.getElementById(
-            "dropdownSearch"
-        ).value
-        .trim()
-        .toLowerCase();
-
-
-    const search =
-        dropdown || input;
-
-
-    renderProductsList(search);
-
-}
-
-
-/* =========================================================
-   عرض المنتجات
-========================================================= */
-
-function renderProductsList(search = "") {
-
-    const list =
-        document.getElementById(
-            "productsList"
+    const quantity =
+        Number(
+            document.getElementById(
+                "quantityInput"
+            ).value
         );
 
 
-    const text =
-        String(search)
-        .trim()
-        .toLowerCase();
+    if(!productId){
 
-
-    const filtered =
-        products.filter(
-            function(product) {
-
-                const content =
-                    (
-                        String(product.name) +
-                        " " +
-                        String(product.brand)
-                    )
-                    .toLowerCase();
-
-
-                return content.includes(text);
-
-            }
+        showToast(
+            "اختر المنتج أولاً",
+            "error"
         );
-
-
-    if (
-        filtered.length === 0
-    ) {
-
-        list.innerHTML = `
-            <div class="no-results">
-                لا توجد منتجات مطابقة
-            </div>
-        `;
 
         return;
 
     }
 
 
-    let html = "";
+    if(
+        !quantity ||
+        quantity < 1
+    ){
 
-
-    filtered.forEach(
-        function(product) {
-
-            html += `
-
-                <div
-                    class="product-option"
-                    onclick="selectProduct(${product.id})"
-                >
-
-                    <div class="option-name">
-                        ${escapeHTML(product.name)}
-                    </div>
-
-                    <div class="option-details">
-
-                        <span>
-                            الماركة:
-                            ${escapeHTML(product.brand)}
-                        </span>
-
-                        <span class="option-price">
-                            ${formatMoney(
-                                calculateSalePrice(product)
-                            )}
-                            جنيه
-                        </span>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-
-    list.innerHTML =
-        html;
-
-}
-
-
-/* =========================================================
-   اختيار المنتج
-========================================================= */
-
-function selectProduct(id) {
-
-    const product =
-        products.find(
-            function(p) {
-                return p.id === id;
-            }
-        );
-
-
-    if (!product) {
-        return;
-    }
-
-
-    selectedProductId =
-        product.id;
-
-
-    document.getElementById(
-        "productInput"
-    ).value =
-        product.name;
-
-
-    document.getElementById(
-        "selectedName"
-    ).textContent =
-        product.name;
-
-
-    document.getElementById(
-        "selectedBrand"
-    ).textContent =
-        product.brand;
-
-
-    document.getElementById(
-        "selectedPrice"
-    ).textContent =
-        formatMoney(
-            calculateSalePrice(product)
-        ) +
-        " جنيه";
-
-
-    document.getElementById(
-        "selectedProduct"
-    ).classList.add("show");
-
-
-    closeProductDropdown();
-
-}
-
-
-/* =========================================================
-   إغلاق القائمة
-========================================================= */
-
-function closeProductDropdown() {
-
-    document
-        .getElementById(
-            "productDropdown"
-        )
-        .classList.remove("show");
-
-}
-
-
-/* =========================================================
-   إضافة المنتج
-========================================================= */
-
-function addSelectedProduct() {
-
-    if (
-        selectedProductId === null
-    ) {
-
-        alert(
-            "من فضلك اختر منتجًا أولاً."
+        showToast(
+            "أدخل كمية صحيحة",
+            "error"
         );
 
         return;
@@ -1760,40 +1509,39 @@ function addSelectedProduct() {
 
     const product =
         products.find(
-            function(p) {
-                return p.id === selectedProductId;
-            }
+            p => p.id === productId
         );
 
 
-    if (!product) {
+    if(!product){
+
+        showToast(
+            "المنتج غير موجود",
+            "error"
+        );
+
         return;
+
     }
 
 
     const existing =
         quoteItems.find(
-            function(item) {
-                return item.id === product.id;
-            }
+            item => item.productId === productId
         );
 
 
-    if (existing) {
+    if(existing){
 
-        existing.qty++;
+        existing.quantity += quantity;
 
-    } else {
+    }else{
 
         quoteItems.push({
 
-            id: product.id,
+            productId:product.id,
 
-            name: product.name,
-
-            brand: product.brand,
-
-            qty: 1
+            quantity:quantity
 
         });
 
@@ -1803,270 +1551,200 @@ function addSelectedProduct() {
     renderQuote();
 
 
-    selectedProductId =
-        null;
-
-
     document.getElementById(
-        "productInput"
-    ).value = "";
+        "quantityInput"
+    ).value = 1;
 
 
-    document.getElementById(
-        "dropdownSearch"
-    ).value = "";
-
-
-    document.getElementById(
-        "selectedProduct"
-    ).classList.remove(
-        "show"
+    showToast(
+        "تمت إضافة المنتج للعرض",
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   عرض عرض السعر
-========================================================= */
+/* =========================
+   RENDER QUOTE
+========================= */
 
-function renderQuote() {
+function renderQuote(){
 
-    const area =
+    const body =
         document.getElementById(
-            "quoteArea"
+            "quoteBody"
         );
 
 
-    const totalArea =
-        document.getElementById(
-            "totalArea"
-        );
+    body.innerHTML = "";
 
 
-    if (
-        quoteItems.length === 0
-    ) {
+    let totalItems = 0;
 
-        area.innerHTML = `
-            <div class="empty">
-                لم تتم إضافة أي منتجات
-            </div>
-        `;
-
-        totalArea.style.display =
-            "none";
-
-        return;
-
-    }
-
-
-    let html = `
-
-        <div style="overflow-x:auto;">
-
-            <table class="quote-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>المنتج</th>
-
-                        <th>الماركة</th>
-
-                        <th>سعر البيع</th>
-
-                        <th>الكمية</th>
-
-                        <th>الإجمالي</th>
-
-                        <th class="delete-column">
-                            حذف
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-    `;
-
+    let totalQuantity = 0;
 
     let grandTotal = 0;
 
-    let totalQty = 0;
-
 
     quoteItems.forEach(
-        function(item, index) {
+
+        (item,index) => {
 
             const product =
                 products.find(
-                    function(p) {
-                        return p.id === item.id;
-                    }
+                    p => p.id === item.productId
                 );
 
 
-            if (!product) {
+            if(!product){
                 return;
             }
 
 
             const salePrice =
                 calculateSalePrice(
-                    product
+                    product.listPrice
                 );
 
 
-            const itemTotal =
+            const lineTotal =
                 salePrice *
-                item.qty;
+                item.quantity;
 
+
+            totalItems++;
+
+            totalQuantity +=
+                item.quantity;
 
             grandTotal +=
-                itemTotal;
+                lineTotal;
 
 
-            totalQty +=
-                item.qty;
+            const row =
+                document.createElement("tr");
 
 
-            html += `
+            row.innerHTML = `
 
-                <tr>
+                <td>
+                    ${index + 1}
+                </td>
 
-                    <td>
-                        ${index + 1}
-                    </td>
+                <td style="text-align:right;">
+                    ${escapeHtml(product.name)}
+                </td>
 
-                    <td style="text-align:right;">
-                        ${escapeHTML(item.name)}
-                    </td>
+                <td>
+                    ${escapeHtml(product.brand)}
+                </td>
 
-                    <td>
-                        ${escapeHTML(item.brand)}
-                    </td>
+                <td class="sale-price">
+                    ${formatMoney(salePrice)}
+                </td>
 
-                    <td class="sale-price">
-                        ${formatMoney(salePrice)}
-                    </td>
-
-                    <td>
-
-                        <input
-                            class="qty-input"
-                            type="number"
-                            min="1"
-                            value="${item.qty}"
-                            onchange="changeQty(
-                                ${item.id},
+                <td>
+                    <input
+                        type="number"
+                        min="1"
+                        value="${item.quantity}"
+                        style="
+                            width:80px;
+                            text-align:center;
+                        "
+                        onchange="
+                            changeQuoteQuantity(
+                                '${product.id}',
                                 this.value
-                            )"
-                        >
+                            )
+                        "
+                    >
+                </td>
 
-                    </td>
+                <td class="price">
+                    ${formatMoney(lineTotal)}
+                </td>
 
-                    <td class="item-total">
-                        ${formatMoney(itemTotal)}
-                    </td>
+                <td class="delete-col no-print">
 
-                    <td class="delete-column">
+                    <button
+                        class="btn-danger btn-small"
+                        onclick="
+                            removeQuoteItem(
+                                '${product.id}'
+                            )
+                        "
+                    >
+                        حذف
+                    </button>
 
-                        <button
-                            class="btn btn-danger"
-                            onclick="removeItem(${item.id})"
-                        >
-                            حذف
-                        </button>
-
-                    </td>
-
-                </tr>
+                </td>
 
             `;
 
+
+            body.appendChild(row);
+
         }
+
     );
-
-
-    html += `
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    `;
-
-
-    area.innerHTML =
-        html;
 
 
     document.getElementById(
         "totalItems"
     ).textContent =
-        quoteItems.length;
+        totalItems;
 
 
     document.getElementById(
-        "totalQty"
+        "totalQuantity"
     ).textContent =
-        totalQty;
+        totalQuantity;
 
 
     document.getElementById(
         "grandTotal"
     ).textContent =
-        formatMoney(grandTotal) +
-        " جنيه";
-
-
-    totalArea.style.display =
-        "flex";
+        formatMoney(grandTotal);
 
 }
 
 
-/* =========================================================
-   تغيير الكمية
-========================================================= */
+/* =========================
+   CHANGE QUOTE QUANTITY
+========================= */
 
-function changeQty(id, value) {
+function changeQuoteQuantity(
+    productId,
+    value
+){
 
-    let qty =
-        parseInt(value, 10);
-
-
-    if (
-        isNaN(qty) ||
-        qty < 1
-    ) {
-
-        qty = 1;
-
-    }
+    const quantity =
+        Number(value);
 
 
     const item =
         quoteItems.find(
-            function(i) {
-                return i.id === id;
-            }
+            i => i.productId === productId
         );
 
 
-    if (item) {
+    if(!item){
+        return;
+    }
 
-        item.qty =
-            qty;
+
+    if(
+        !quantity ||
+        quantity < 1
+    ){
+
+        item.quantity = 1;
+
+    }else{
+
+        item.quantity =
+            Math.floor(quantity);
 
     }
 
@@ -2076,17 +1754,16 @@ function changeQty(id, value) {
 }
 
 
-/* =========================================================
-   حذف من العرض
-========================================================= */
+/* =========================
+   REMOVE QUOTE ITEM
+========================= */
 
-function removeItem(id) {
+function removeQuoteItem(productId){
 
     quoteItems =
         quoteItems.filter(
-            function(item) {
-                return item.id !== id;
-            }
+            item =>
+                item.productId !== productId
         );
 
 
@@ -2095,137 +1772,186 @@ function removeItem(id) {
 }
 
 
-/* =========================================================
-   مسح العرض
-========================================================= */
+/* =========================
+   CLEAR QUOTE
+========================= */
 
-function clearQuote() {
+function clearQuote(){
 
-    if (
+    if(
         quoteItems.length === 0
-    ) {
+    ){
+
         return;
+
     }
 
 
-    if (
+    if(
         !confirm(
-            "هل تريد مسح جميع المنتجات؟"
+            "هل أنت متأكد من مسح عرض السعر بالكامل؟"
         )
-    ) {
+    ){
+
         return;
+
     }
 
 
     quoteItems = [];
 
-
     renderQuote();
 
-}
 
-
-/* =========================================================
-   فتح الدخول
-========================================================= */
-
-function openLogin() {
-
-    document
-        .getElementById(
-            "loginModal"
-        )
-        .classList.add("show");
-
-
-    document.getElementById(
-        "passwordInput"
-    ).value = "";
-
-
-    document.getElementById(
-        "loginError"
-    ).style.display =
-        "none";
-
-
-    setTimeout(
-        function() {
-
-            document
-                .getElementById(
-                    "passwordInput"
-                )
-                .focus();
-
-        },
-        100
+    showToast(
+        "تم مسح عرض السعر",
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   إغلاق الدخول
-========================================================= */
+/* =========================
+   PRINT QUOTE
+========================= */
 
-function closeLogin() {
+function printQuote(){
 
-    document
-        .getElementById(
-            "loginModal"
-        )
-        .classList.remove(
-            "show"
+    if(
+        quoteItems.length === 0
+    ){
+
+        showToast(
+            "لا يوجد منتجات في عرض السعر",
+            "error"
         );
-
-}
-
-
-/* =========================================================
-   تسجيل الدخول
-========================================================= */
-
-function loginAdmin() {
-
-    const password =
-        document.getElementById(
-            "passwordInput"
-        ).value;
-
-
-    if (
-        password !==
-        settings.password
-    ) {
-
-        document.getElementById(
-            "loginError"
-        ).style.display =
-            "block";
 
         return;
 
     }
 
 
-    closeLogin();
-
-    openAdminPanel();
+    window.print();
 
 }
 
 
-/* =========================================================
-   لوحة المدير
-========================================================= */
+/* =========================
+   LOGIN
+========================= */
 
-function openAdminPanel() {
+function openLogin(){
 
     document.getElementById(
-        "adminPanel"
-    ).style.display =
-        "block";
+        "loginModal"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "managerPassword"
+    ).value = "";
+
+
+    setTimeout(
+
+        () => {
+
+            document.getElementById(
+                "managerPassword"
+            ).focus();
+
+        },
+
+        100
+
+    );
+
+}
+
+
+/* =========================
+   CLOSE LOGIN
+========================= */
+
+function closeLogin(){
+
+    document.getElementById(
+        "loginModal"
+    ).classList.add("hidden");
+
+}
+
+
+/* =========================
+   LOGIN MANAGER
+========================= */
+
+function loginManager(){
+
+    const password =
+        document.getElementById(
+            "managerPassword"
+        ).value;
+
+
+    if(password !== MANAGER_PASSWORD){
+
+        showToast(
+            "كلمة المرور غير صحيحة",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    isManagerLoggedIn = true;
+
+
+    sessionStorage.setItem(
+        MANAGER_LOGIN_KEY,
+        "true"
+    );
+
+
+    closeLogin();
+
+    showManagerPanel();
+
+}
+
+
+/* =========================
+   CHECK SESSION
+========================= */
+
+function checkManagerSession(){
+
+    const logged =
+        sessionStorage.getItem(
+            MANAGER_LOGIN_KEY
+        );
+
+
+    if(logged === "true"){
+
+        isManagerLoggedIn = true;
+
+    }
+
+}
+
+
+/* =========================
+   SHOW MANAGER PANEL
+========================= */
+
+function showManagerPanel(){
+
+    document.getElementById(
+        "managerPanel"
+    ).classList.remove("hidden");
 
 
     document.getElementById(
@@ -2240,26 +1966,52 @@ function openAdminPanel() {
         settings.profitPercent;
 
 
-    renderAdminProducts();
-
-
-    document.getElementById(
-        "adminPanel"
-    ).scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+    renderManagerProducts();
 
 }
 
 
-/* =========================================================
-   حفظ الإعدادات
-========================================================= */
+/* =========================
+   LOGOUT
+========================= */
 
-function saveSettings() {
+function logoutManager(){
 
-    const discount =
+    isManagerLoggedIn = false;
+
+
+    sessionStorage.removeItem(
+        MANAGER_LOGIN_KEY
+    );
+
+
+    document.getElementById(
+        "managerPanel"
+    ).classList.add("hidden");
+
+
+    showToast(
+        "تم تسجيل الخروج",
+        "success"
+    );
+
+}
+
+
+/* =========================
+   SAVE SETTINGS
+========================= */
+
+function saveSettings(){
+
+    if(!isManagerLoggedIn){
+
+        return;
+
+    }
+
+
+    const dealerDiscount =
         Number(
             document.getElementById(
                 "dealerDiscount"
@@ -2267,7 +2019,7 @@ function saveSettings() {
         );
 
 
-    const profit =
+    const profitPercent =
         Number(
             document.getElementById(
                 "profitPercent"
@@ -2275,15 +2027,14 @@ function saveSettings() {
         );
 
 
-    if (
-        !Number.isFinite(discount) ||
-        discount < 0 ||
-        discount > 100
-    ) {
+    if(
+        isNaN(dealerDiscount) ||
+        dealerDiscount < 0
+    ){
 
-        showAdminMessage(
-            "نسبة الخصم يجب أن تكون بين 0 و100%",
-            false
+        showToast(
+            "أدخل خصم موزع صحيح",
+            "error"
         );
 
         return;
@@ -2291,15 +2042,14 @@ function saveSettings() {
     }
 
 
-    if (
-        !Number.isFinite(profit) ||
-        profit < 0 ||
-        profit > 1000
-    ) {
+    if(
+        isNaN(profitPercent) ||
+        profitPercent < 0
+    ){
 
-        showAdminMessage(
-            "نسبة الربح غير صحيحة",
-            false
+        showToast(
+            "أدخل نسبة ربح صحيحة",
+            "error"
         );
 
         return;
@@ -2307,68 +2057,131 @@ function saveSettings() {
     }
 
 
-    settings.dealerDiscount =
-        discount;
+    settings = {
+
+        dealerDiscount:
+            dealerDiscount,
+
+        profitPercent:
+            profitPercent
+
+    };
 
 
-    settings.profitPercent =
-        profit;
+    saveSettingsToStorage();
 
 
-    localStorage.setItem(
-        "powerMasterPricingSettings",
-        JSON.stringify(settings)
-    );
-
-
-    renderProductsList();
+    renderProductSelect();
 
     renderQuote();
 
-    renderAdminProducts();
+    renderManagerProducts();
 
 
-    showAdminMessage(
-        "تم حفظ النسب وتحديث الأسعار بنجاح",
-        true
+    showToast(
+        "تم حفظ إعدادات التسعير",
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   إضافة أو تعديل منتج
-========================================================= */
+/* =========================
+   OPEN ADD PRODUCT
+========================= */
 
-function saveProduct() {
+function openAddProduct(){
+
+    document.getElementById(
+        "productForm"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "productFormTitle"
+    ).textContent =
+        "إضافة منتج";
+
+
+    document.getElementById(
+        "editProductId"
+    ).value = "";
+
+
+    document.getElementById(
+        "productName"
+    ).value = "";
+
+
+    document.getElementById(
+        "productBrand"
+    ).value = "";
+
+
+    document.getElementById(
+        "productListPrice"
+    ).value = "";
+
+}
+
+
+/* =========================
+   CLOSE PRODUCT FORM
+========================= */
+
+function closeProductForm(){
+
+    document.getElementById(
+        "productForm"
+    ).classList.add("hidden");
+
+}
+
+
+/* =========================
+   SAVE PRODUCT
+========================= */
+
+function saveProduct(){
+
+    if(!isManagerLoggedIn){
+
+        return;
+
+    }
+
+
+    const id =
+        document.getElementById(
+            "editProductId"
+        ).value.trim();
+
 
     const name =
         document.getElementById(
-            "adminProductName"
+            "productName"
         ).value.trim();
 
 
     const brand =
         document.getElementById(
-            "adminProductBrand"
+            "productBrand"
         ).value.trim();
 
 
-    const priceText =
-        document.getElementById(
-            "adminProductPrice"
-        ).value;
+    const listPrice =
+        Number(
+            document.getElementById(
+                "productListPrice"
+            ).value
+        );
 
 
-    const price =
-        Number(priceText);
+    if(!name){
 
-
-    if (!name) {
-
-        showAdminMessage(
-            "اكتب اسم المنتج",
-            false
+        showToast(
+            "أدخل اسم المنتج",
+            "error"
         );
 
         return;
@@ -2376,11 +2189,11 @@ function saveProduct() {
     }
 
 
-    if (!brand) {
+    if(!brand){
 
-        showAdminMessage(
-            "اكتب الماركة",
-            false
+        showToast(
+            "أدخل الماركة",
+            "error"
         );
 
         return;
@@ -2388,14 +2201,14 @@ function saveProduct() {
     }
 
 
-    if (
-        !Number.isFinite(price) ||
-        price < 0
-    ) {
+    if(
+        isNaN(listPrice) ||
+        listPrice < 0
+    ){
 
-        showAdminMessage(
+        showToast(
             "أدخل سعر اللستة بشكل صحيح",
-            false
+            "error"
         );
 
         return;
@@ -2403,19 +2216,15 @@ function saveProduct() {
     }
 
 
-    if (
-        editingProductId !== null
-    ) {
+    if(id){
 
         const product =
             products.find(
-                function(p) {
-                    return p.id === editingProductId;
-                }
+                p => p.id === id
             );
 
 
-        if (product) {
+        if(product){
 
             product.name =
                 name;
@@ -2424,22 +2233,22 @@ function saveProduct() {
                 brand;
 
             product.listPrice =
-                price;
+                listPrice;
 
         }
 
 
-        showAdminMessage(
-            "تم تعديل المنتج بنجاح",
-            true
+        showToast(
+            "تم تعديل المنتج",
+            "success"
         );
 
-    } else {
+    }else{
 
         products.push({
 
             id:
-                Date.now(),
+                generateId(),
 
             name:
                 name,
@@ -2448,14 +2257,14 @@ function saveProduct() {
                 brand,
 
             listPrice:
-                price
+                listPrice
 
         });
 
 
-        showAdminMessage(
-            "تم إضافة المنتج بنجاح",
-            true
+        showToast(
+            "تمت إضافة المنتج",
+            "success"
         );
 
     }
@@ -2463,331 +2272,101 @@ function saveProduct() {
 
     saveProducts();
 
-    clearProductForm();
 
-    renderProductsList();
+    closeProductForm();
 
-    renderAdminProducts();
+
+    renderProductSelect();
+
+    renderManagerProducts();
 
 }
 
 
-/* =========================================================
-   تعديل منتج
-========================================================= */
+/* =========================
+   EDIT PRODUCT
+========================= */
 
-function editProduct(id) {
+function editProduct(id){
 
     const product =
         products.find(
-            function(p) {
-                return p.id === id;
-            }
+            p => p.id === id
         );
 
 
-    if (!product) {
+    if(!product){
         return;
     }
 
 
-    editingProductId =
-        id;
+    document.getElementById(
+        "productForm"
+    ).classList.remove("hidden");
 
 
     document.getElementById(
-        "adminProductName"
+        "productFormTitle"
+    ).textContent =
+        "تعديل المنتج";
+
+
+    document.getElementById(
+        "editProductId"
+    ).value =
+        product.id;
+
+
+    document.getElementById(
+        "productName"
     ).value =
         product.name;
 
 
     document.getElementById(
-        "adminProductBrand"
+        "productBrand"
     ).value =
         product.brand;
 
 
     document.getElementById(
-        "adminProductPrice"
+        "productListPrice"
     ).value =
         product.listPrice;
 
 
     document.getElementById(
-        "saveProductButton"
-    ).textContent =
-        "حفظ تعديل المنتج";
-
-
-    document.getElementById(
-        "saveProductButton"
-    ).className =
-        "btn btn-warning";
-
-
-    document.getElementById(
-        "cancelEditArea"
-    ).style.display =
-        "block";
-
-
-    document.getElementById(
-        "adminProductName"
-    ).focus();
+        "productForm"
+    ).scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
 
 }
 
 
-/* =========================================================
-   إلغاء التعديل
-========================================================= */
-
-function cancelProductEdit() {
-
-    clearProductForm();
-
-}
-
-
-/* =========================================================
-   تنظيف نموذج المنتج
-========================================================= */
-
-function clearProductForm() {
-
-    document.getElementById(
-        "adminProductName"
-    ).value = "";
-
-
-    document.getElementById(
-        "adminProductBrand"
-    ).value = "";
-
-
-    document.getElementById(
-        "adminProductPrice"
-    ).value = "";
-
-
-    document.getElementById(
-        "saveProductButton"
-    ).textContent =
-        "+ إضافة المنتج";
-
-
-    document.getElementById(
-        "saveProductButton"
-    ).className =
-        "btn btn-success";
-
-
-    document.getElementById(
-        "cancelEditArea"
-    ).style.display =
-        "none";
-
-
-    editingProductId =
-        null;
-
-}
-
-
-/* =========================================================
-   عرض منتجات المدير
-========================================================= */
-
-function renderAdminProducts() {
-
-    const area =
-        document.getElementById(
-            "adminProductsTable"
-        );
-
-
-    const search =
-        document.getElementById(
-            "adminProductSearch"
-        ).value
-        .trim()
-        .toLowerCase();
-
-
-    const filtered =
-        products.filter(
-            function(product) {
-
-                const text =
-                    (
-                        product.name +
-                        " " +
-                        product.brand
-                    )
-                    .toLowerCase();
-
-
-                return text.includes(search);
-
-            }
-        );
-
-
-    if (
-        filtered.length === 0
-    ) {
-
-        area.innerHTML = `
-            <div class="empty">
-                لا توجد منتجات
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    let html = `
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>#</th>
-
-                    <th>اسم المنتج</th>
-
-                    <th>الماركة</th>
-
-                    <th>سعر اللستة</th>
-
-                    <th>سعر الشراء</th>
-
-                    <th>سعر البيع</th>
-
-                    <th>الإجراءات</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-    `;
-
-
-    filtered.forEach(
-        function(product, index) {
-
-            const purchase =
-                calculatePurchasePrice(
-                    product
-                );
-
-
-            const sale =
-                calculateSalePrice(
-                    product
-                );
-
-
-            html += `
-
-                <tr>
-
-                    <td>
-                        ${index + 1}
-                    </td>
-
-                    <td style="text-align:right;">
-                        ${escapeHTML(product.name)}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(product.brand)}
-                    </td>
-
-                    <td>
-                        ${formatMoney(product.listPrice)}
-                    </td>
-
-                    <td>
-                        ${formatMoney(purchase)}
-                    </td>
-
-                    <td class="sale-price">
-                        ${formatMoney(sale)}
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="btn btn-warning admin-small-btn"
-                            onclick="editProduct(${product.id})"
-                        >
-                            تعديل
-                        </button>
-
-                        <button
-                            class="btn btn-danger admin-small-btn"
-                            onclick="deleteProduct(${product.id})"
-                        >
-                            حذف
-                        </button>
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }
-    );
-
-
-    html += `
-
-            </tbody>
-
-        </table>
-
-    `;
-
-
-    area.innerHTML =
-        html;
-
-}
-
-
-/* =========================================================
-   حذف منتج
-========================================================= */
-
-function deleteProduct(id) {
+/* =========================
+   DELETE PRODUCT
+========================= */
+
+function deleteProduct(id){
 
     const product =
         products.find(
-            function(p) {
-                return p.id === id;
-            }
+            p => p.id === id
         );
 
 
-    if (!product) {
+    if(!product){
         return;
     }
 
 
-    if (
+    if(
         !confirm(
-            "هل تريد حذف المنتج؟\n\n" +
-            product.name
+            `هل أنت متأكد من حذف المنتج:\n\n${product.name}؟`
         )
-    ) {
+    ){
 
         return;
 
@@ -2796,391 +2375,46 @@ function deleteProduct(id) {
 
     products =
         products.filter(
-            function(p) {
-                return p.id !== id;
-            }
+            p => p.id !== id
         );
 
 
     quoteItems =
         quoteItems.filter(
-            function(item) {
-                return item.id !== id;
-            }
+            item =>
+                item.productId !== id
         );
 
 
     saveProducts();
 
-    renderProductsList();
 
-    renderAdminProducts();
+    renderProductSelect();
 
     renderQuote();
 
+    renderManagerProducts();
 
-    showAdminMessage(
-        "تم حذف المنتج بنجاح",
-        true
+
+    showToast(
+        "تم حذف المنتج",
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   استيراد Excel
-========================================================= */
+/* =========================
+   DELETE ALL PRODUCTS
+========================= */
 
-function importProducts(event) {
+function deleteAllProducts(){
 
-    const file =
-        event.target.files[0];
+    if(products.length === 0){
 
-
-    if (!file) {
-        return;
-    }
-
-
-    if (
-        typeof XLSX === "undefined"
-    ) {
-
-        alert(
-            "لم يتم تحميل مكتبة Excel.\n\n" +
-            "تأكد من وجود اتصال بالإنترنت ثم أعد فتح الصفحة."
-        );
-
-        event.target.value = "";
-
-        return;
-
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function(e) {
-
-            try {
-
-                const workbook =
-                    XLSX.read(
-                        e.target.result,
-                        {
-                            type: "array"
-                        }
-                    );
-
-
-                const sheet =
-                    workbook.Sheets[
-                        workbook.SheetNames[0]
-                    ];
-
-
-                const rows =
-                    XLSX.utils.sheet_to_json(
-                        sheet,
-                        {
-                            header: 1,
-                            defval: ""
-                        }
-                    );
-
-
-                if (
-                    rows.length < 2
-                ) {
-
-                    alert(
-                        "ملف Excel لا يحتوي على بيانات."
-                    );
-
-                    return;
-
-                }
-
-
-                const headers =
-                    rows[0].map(
-                        function(value) {
-
-                            return String(
-                                value
-                            )
-                            .trim()
-                            .toLowerCase();
-
-                        }
-                    );
-
-
-                let nameIndex =
-                    findColumn(
-                        headers,
-                        [
-                            "اسم المنتج",
-                            "المنتج",
-                            "اسم"
-                        ]
-                    );
-
-
-                let brandIndex =
-                    findColumn(
-                        headers,
-                        [
-                            "الماركة",
-                            "العلامة التجارية",
-                            "البراند"
-                        ]
-                    );
-
-
-                let priceIndex =
-                    findColumn(
-                        headers,
-                        [
-                            "سعر اللستة",
-                            "سعر القائمة",
-                            "السعر"
-                        ]
-                    );
-
-
-                /*
-                   إذا لم تكن العناوين مطابقة،
-                   يستخدم الأعمدة الثلاثة الأولى
-                */
-
-                if (
-                    nameIndex === -1
-                ) {
-                    nameIndex = 0;
-                }
-
-
-                if (
-                    brandIndex === -1
-                ) {
-                    brandIndex = 1;
-                }
-
-
-                if (
-                    priceIndex === -1
-                ) {
-                    priceIndex = 2;
-                }
-
-
-                const imported = [];
-
-
-                for (
-                    let i = 1;
-                    i < rows.length;
-                    i++
-                ) {
-
-                    const row =
-                        rows[i];
-
-
-                    const name =
-                        String(
-                            row[nameIndex] || ""
-                        ).trim();
-
-
-                    const brand =
-                        String(
-                            row[brandIndex] || ""
-                        ).trim();
-
-
-                    let price =
-                        row[priceIndex];
-
-
-                    if (
-                        typeof price === "string"
-                    ) {
-
-                        price =
-                            price
-                            .replace(/,/g, "")
-                            .trim();
-
-                    }
-
-
-                    price =
-                        Number(price);
-
-
-                    if (
-                        !name ||
-                        !brand ||
-                        !Number.isFinite(price)
-                    ) {
-
-                        continue;
-
-                    }
-
-
-                    imported.push({
-
-                        id:
-                            Date.now() +
-                            i,
-
-                        name:
-                            name,
-
-                        brand:
-                            brand,
-
-                        listPrice:
-                            price
-
-                    });
-
-                }
-
-
-                if (
-                    imported.length === 0
-                ) {
-
-                    alert(
-                        "لم يتم العثور على منتجات صحيحة.\n\n" +
-                        "تأكد من أن الأعمدة هي:\n" +
-                        "اسم المنتج | الماركة | سعر اللستة"
-                    );
-
-                    return;
-
-                }
-
-
-                const answer =
-                    confirm(
-                        "تم العثور على " +
-                        imported.length +
-                        " منتج.\n\n" +
-                        "هل تريد استبدال المنتجات الحالية بهذه البيانات؟"
-                    );
-
-
-                if (!answer) {
-                    return;
-                }
-
-
-                products =
-                    imported;
-
-
-                quoteItems = [];
-
-
-                saveProducts();
-
-                renderProductsList();
-
-                renderAdminProducts();
-
-                renderQuote();
-
-
-                showAdminMessage(
-                    "تم استيراد " +
-                    imported.length +
-                    " منتج بنجاح",
-                    true
-                );
-
-
-            } catch(error) {
-
-                console.error(error);
-
-                alert(
-                    "حدث خطأ أثناء قراءة ملف Excel.\n\n" +
-                    "تأكد من أن الملف سليم."
-                );
-
-            }
-
-
-            event.target.value = "";
-
-        };
-
-
-    reader.readAsArrayBuffer(file);
-
-}
-
-
-/* =========================================================
-   البحث عن العمود
-========================================================= */
-
-function findColumn(
-    headers,
-    names
-) {
-
-    for (
-        let i = 0;
-        i < headers.length;
-        i++
-    ) {
-
-        for (
-            let j = 0;
-            j < names.length;
-            j++
-        ) {
-
-            if (
-                headers[i] ===
-                names[j].toLowerCase()
-            ) {
-
-                return i;
-
-            }
-
-        }
-
-    }
-
-
-    return -1;
-
-}
-
-
-/* =========================================================
-   تصدير المنتجات
-========================================================= */
-
-function exportProducts() {
-
-    if (
-        products.length === 0
-    ) {
-
-        alert(
-            "لا توجد منتجات لتصديرها."
+        showToast(
+            "لا توجد منتجات للحذف",
+            "error"
         );
 
         return;
@@ -3188,103 +2422,7 @@ function exportProducts() {
     }
 
 
-    if (
-        typeof XLSX === "undefined"
-    ) {
-
-        alert(
-            "مكتبة Excel غير متاحة. تأكد من اتصال الإنترنت."
-        );
-
-        return;
-
-    }
-
-
-    const data = [
-
-        [
-            "اسم المنتج",
-            "الماركة",
-            "سعر اللستة"
-        ]
-
-    ];
-
-
-    products.forEach(
-        function(product) {
-
-            data.push([
-
-                product.name,
-
-                product.brand,
-
-                product.listPrice
-
-            ]);
-
-        }
-    );
-
-
-    const worksheet =
-        XLSX.utils.aoa_to_sheet(
-            data
-        );
-
-
-    worksheet["!cols"] = [
-
-        { wch: 45 },
-
-        { wch: 20 },
-
-        { wch: 15 }
-
-    ];
-
-
-    const workbook =
-        XLSX.utils.book_new();
-
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "المنتجات"
-    );
-
-
-    XLSX.writeFile(
-        workbook,
-        "Power_Master_Products.xlsx"
-    );
-
-}
-
-
-/* =========================================================
-   حذف جميع المنتجات
-========================================================= */
-
-function deleteAllProducts() {
-
-    if (
-        products.length === 0
-    ) {
-
-        alert(
-            "لا توجد منتجات للحذف."
-        );
-
-        return;
-
-    }
-
-
-    const answer =
+    const confirmed =
         confirm(
             "تحذير!\n\n" +
             "سيتم حذف جميع المنتجات من النظام.\n\n" +
@@ -3292,7 +2430,7 @@ function deleteAllProducts() {
         );
 
 
-    if (!answer) {
+    if(!confirmed){
         return;
     }
 
@@ -3304,179 +2442,212 @@ function deleteAllProducts() {
 
     saveProducts();
 
-    renderProductsList();
 
-    renderAdminProducts();
+    renderProductSelect();
 
     renderQuote();
 
+    renderManagerProducts();
 
-    showAdminMessage(
+
+    showToast(
         "تم حذف جميع المنتجات",
-        true
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   تغيير كلمة المرور
-========================================================= */
+/* =========================
+   RENDER MANAGER PRODUCTS
+========================= */
 
-function changePassword() {
+function renderManagerProducts(){
 
-    const current =
-        prompt(
-            "أدخل كلمة المرور الحالية:"
-        );
-
-
-    if (
-        current === null
-    ) {
+    if(!isManagerLoggedIn){
         return;
     }
 
 
-    if (
-        current !==
-        settings.password
-    ) {
-
-        alert(
-            "كلمة المرور الحالية غير صحيحة."
-        );
-
-        return;
-
-    }
-
-
-    const newPassword =
-        prompt(
-            "أدخل كلمة المرور الجديدة:"
-        );
-
-
-    if (
-        !newPassword ||
-        newPassword.length < 4
-    ) {
-
-        alert(
-            "كلمة المرور يجب أن تكون 4 أحرف أو أرقام على الأقل."
-        );
-
-        return;
-
-    }
-
-
-    const confirmation =
-        prompt(
-            "أعد إدخال كلمة المرور الجديدة:"
-        );
-
-
-    if (
-        newPassword !==
-        confirmation
-    ) {
-
-        alert(
-            "كلمتا المرور غير متطابقتين."
-        );
-
-        return;
-
-    }
-
-
-    settings.password =
-        newPassword;
-
-
-    localStorage.setItem(
-        "powerMasterPricingSettings",
-        JSON.stringify(settings)
-    );
-
-
-    alert(
-        "تم تغيير كلمة المرور بنجاح."
-    );
-
-}
-
-
-/* =========================================================
-   خروج المدير
-========================================================= */
-
-function logoutAdmin() {
-
-    document.getElementById(
-        "adminPanel"
-    ).style.display =
-        "none";
-
-}
-
-
-/* =========================================================
-   رسالة المدير
-========================================================= */
-
-function showAdminMessage(
-    text,
-    success
-) {
-
-    const message =
+    const body =
         document.getElementById(
-            "adminMessage"
+            "managerProductsBody"
         );
 
 
-    message.textContent =
-        text;
+    if(!body){
+        return;
+    }
 
 
-    message.className =
-        success
-        ? "message success-message"
-        : "message error-message";
+    const search =
+        document.getElementById(
+            "managerSearch"
+        ).value
+        .trim()
+        .toLowerCase();
 
 
-    message.style.display =
-        "block";
+    const filtered =
+        products.filter(
+
+            product => {
+
+                const name =
+                    String(product.name)
+                        .toLowerCase();
+
+                const brand =
+                    String(product.brand)
+                        .toLowerCase();
 
 
-    setTimeout(
-        function() {
+                return (
+                    name.includes(search) ||
+                    brand.includes(search)
+                );
 
-            message.style.display =
-                "none";
+            }
 
-        },
-        3500
+        );
+
+
+    body.innerHTML = "";
+
+
+    filtered.forEach(
+
+        (product,index) => {
+
+            const purchasePrice =
+                calculatePurchasePrice(
+                    product.listPrice
+                );
+
+
+            const salePrice =
+                calculateSalePrice(
+                    product.listPrice
+                );
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td style="text-align:right;">
+                    ${escapeHtml(product.name)}
+                </td>
+
+                <td>
+                    ${escapeHtml(product.brand)}
+                </td>
+
+                <td class="price">
+                    ${formatMoney(product.listPrice)}
+                </td>
+
+                <td>
+                    ${formatMoney(purchasePrice)}
+                </td>
+
+                <td class="sale-price">
+                    ${formatMoney(salePrice)}
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn-primary btn-small"
+                        onclick="
+                            editProduct(
+                                '${product.id}'
+                            )
+                        "
+                    >
+                        تعديل
+                    </button>
+
+                    <button
+                        class="btn-danger btn-small"
+                        onclick="
+                            deleteProduct(
+                                '${product.id}'
+                            )
+                        "
+                    >
+                        حذف
+                    </button>
+
+                </td>
+
+            `;
+
+
+            body.appendChild(row);
+
+        }
+
     );
+
+
+    if(filtered.length === 0){
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    style="padding:30px;"
+                >
+                    لا توجد منتجات
+                </td>
+
+            </tr>
+
+        `;
+
+    }
 
 }
 
 
-/* =========================================================
-   الطباعة
-========================================================= */
+/* =========================
+   IMPORT EXCEL
+========================= */
 
-function printQuote() {
+function importExcel(event){
 
-    if (
-        quoteItems.length === 0
-    ) {
+    if(!isManagerLoggedIn){
 
-        alert(
-            "أضف منتجًا واحدًا على الأقل."
+        return;
+
+    }
+
+
+    const file =
+        event.target.files[0];
+
+
+    if(!file){
+        return;
+    }
+
+
+    if(
+        typeof XLSX === "undefined"
+    ){
+
+        showToast(
+            "تعذر تحميل مكتبة Excel",
+            "error"
         );
 
         return;
@@ -3484,50 +2655,459 @@ function printQuote() {
     }
 
 
-    window.print();
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e){
+
+            try{
+
+                const data =
+                    new Uint8Array(
+                        e.target.result
+                    );
+
+
+                const workbook =
+                    XLSX.read(
+                        data,
+                        {
+                            type:"array"
+                        }
+                    );
+
+
+                const firstSheet =
+                    workbook.Sheets[
+                        workbook.SheetNames[0]
+                    ];
+
+
+                const rows =
+                    XLSX.utils.sheet_to_json(
+                        firstSheet,
+                        {
+                            defval:""
+                        }
+                    );
+
+
+                if(
+                    !rows ||
+                    rows.length === 0
+                ){
+
+                    showToast(
+                        "ملف Excel فارغ",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                const importedProducts = [];
+
+
+                rows.forEach(
+
+                    row => {
+
+                        const name =
+                            getExcelValue(
+                                row,
+                                [
+                                    "اسم المنتج",
+                                    "المنتج",
+                                    "اسم",
+                                    "Product",
+                                    "Product Name"
+                                ]
+                            );
+
+
+                        const brand =
+                            getExcelValue(
+                                row,
+                                [
+                                    "الماركة",
+                                    "العلامة التجارية",
+                                    "البراند",
+                                    "Brand"
+                                ]
+                            );
+
+
+                        const listPriceRaw =
+                            getExcelValue(
+                                row,
+                                [
+                                    "سعر اللستة",
+                                    "سعر القائمة",
+                                    "السعر",
+                                    "List Price",
+                                    "Price"
+                                ]
+                            );
+
+
+                        const listPrice =
+                            parseFloat(
+                                String(listPriceRaw)
+                                    .replace(/,/g,"")
+                            );
+
+
+                        if(
+                            name &&
+                            !isNaN(listPrice)
+                        ){
+
+                            importedProducts.push({
+
+                                id:
+                                    generateId(),
+
+                                name:
+                                    String(name).trim(),
+
+                                brand:
+                                    String(
+                                        brand || ""
+                                    ).trim(),
+
+                                listPrice:
+                                    listPrice
+
+                            });
+
+                        }
+
+                    }
+
+                );
+
+
+                if(
+                    importedProducts.length === 0
+                ){
+
+                    showToast(
+                        "لم يتم العثور على بيانات صحيحة في Excel",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                const confirmed =
+                    confirm(
+
+                        "سيتم استبدال قائمة المنتجات الحالية بالبيانات الموجودة في ملف Excel.\n\n" +
+
+                        "عدد المنتجات التي سيتم استيرادها: " +
+                        importedProducts.length +
+                        "\n\n" +
+
+                        "هل تريد المتابعة؟"
+
+                    );
+
+
+                if(!confirmed){
+                    return;
+                }
+
+
+                products =
+                    importedProducts;
+
+
+                quoteItems = [];
+
+
+                saveProducts();
+
+
+                renderProductSelect();
+
+                renderQuote();
+
+                renderManagerProducts();
+
+
+                showToast(
+                    `تم استيراد ${importedProducts.length} منتج`,
+                    "success"
+                );
+
+
+            }catch(error){
+
+                console.error(error);
+
+                showToast(
+                    "حدث خطأ أثناء قراءة ملف Excel",
+                    "error"
+                );
+
+            }
+
+        };
+
+
+    reader.readAsArrayBuffer(file);
+
+
+    event.target.value = "";
 
 }
 
 
-/* =========================================================
-   إغلاق القائمة عند الضغط خارجها
-========================================================= */
+/* =========================
+   GET EXCEL VALUE
+========================= */
 
-document.addEventListener(
-    "click",
-    function(event) {
+function getExcelValue(
+    row,
+    possibleNames
+){
 
-        const selector =
-            document.querySelector(
-                ".product-selector"
-            );
+    for(
+        const name of possibleNames
+    ){
 
-
-        if (
-            selector &&
-            !selector.contains(
-                event.target
+        if(
+            Object.prototype.hasOwnProperty.call(
+                row,
+                name
             )
-        ) {
+        ){
 
-            closeProductDropdown();
+            return row[name];
 
         }
 
     }
-);
 
 
-/* =========================================================
-   التشغيل
-========================================================= */
+    /*
+        محاولة التعرف على الأعمدة
+        بدون الاعتماد الكامل على الاسم
+    */
 
-renderProductsList();
+    const keys =
+        Object.keys(row);
 
-renderQuote();
+
+    for(
+        const key of keys
+    ){
+
+        const normalized =
+            String(key)
+                .trim()
+                .toLowerCase();
+
+
+        for(
+            const name of possibleNames
+        ){
+
+            const normalizedName =
+                String(name)
+                    .trim()
+                    .toLowerCase();
+
+
+            if(
+                normalized === normalizedName
+            ){
+
+                return row[key];
+
+            }
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================
+   EXPORT EXCEL
+========================= */
+
+function exportExcel(){
+
+    if(!isManagerLoggedIn){
+
+        return;
+
+    }
+
+
+    if(
+        typeof XLSX === "undefined"
+    ){
+
+        showToast(
+            "تعذر تحميل مكتبة Excel",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(products.length === 0){
+
+        showToast(
+            "لا توجد منتجات للتصدير",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Excel يحتوي فقط على:
+        اسم المنتج
+        الماركة
+        سعر اللستة
+
+        بدون:
+        سعر الشراء
+        سعر البيع
+        الخصم
+        الربح
+        الكود
+    */
+
+    const rows =
+        products.map(
+
+            product => ({
+
+                "اسم المنتج":
+                    product.name,
+
+                "الماركة":
+                    product.brand,
+
+                "سعر اللستة":
+                    product.listPrice
+
+            })
+
+        );
+
+
+    const worksheet =
+        XLSX.utils.json_to_sheet(
+            rows
+        );
+
+
+    const workbook =
+        XLSX.utils.book_new();
+
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Products"
+    );
+
+
+    XLSX.writeFile(
+        workbook,
+        "Power_Master_Products.xlsx"
+    );
+
+
+    showToast(
+        "تم تصدير ملف Excel",
+        "success"
+    );
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer = null;
+
+
+function showToast(
+    message,
+    type = ""
+){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.className =
+        "toast show " + type;
+
+
+    clearTimeout(toastTimer);
+
+
+    toastTimer =
+        setTimeout(
+
+            function(){
+
+                toast.className =
+                    "toast";
+
+            },
+
+            2800
+
+        );
+
+}
 
 </script>
 
 </body>
-
 </html>
